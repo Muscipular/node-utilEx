@@ -1,13 +1,12 @@
 {
-  "name": "node-utilEx",
-  "version": "0.0.1",
-  "private": true,
-  "scripts": {
-    "test": "node test.js"
-  },
-  "dependencies": {
-    "nodeunit": "*"
-  }
+    "name": "node-utilEx",
+    "version": "0.0.1",
+    "private": true,
+    "scripts": {
+    },
+    "dependencies": {
+        "nodeunit": "*"
+    }
 }
 
 
