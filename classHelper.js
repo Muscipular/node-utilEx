@@ -1,22 +1,6 @@
 var extend = require('./extend').extend;
 var args2Array = require('./arrayHelper').args2Array;
 
-var Stack = function () {
-    var f = function () {
-    };
-    f.stack = [];
-    f.push = f.stack.push.bind(f.stack);
-    f.pop = f.stack.pop.bind(f.stack);
-    f.size = function () {
-        return f.stack.length;
-    };
-    f.get = function (i) {
-        return f.stack[i];
-    };
-    return f;
-};
-
-
 var inheritEx = function (childClass, baseClass) {
     if (childClass === baseClass) {
         throw new Error('Can not inherits class self.');
@@ -24,7 +8,12 @@ var inheritEx = function (childClass, baseClass) {
     var base = function (optClass) {
         var self = this;
         if (!hasOwnProperty(self, '_baseStack_')) {
-            self._baseStack_ = Stack();
+            Object.defineProperty(self, "_baseStack_", {
+                value: [],
+                writable: false,
+                enumerable: false,
+                configurable: false
+            });
         }
         var currentBase = null;
         if (optClass && typeof optClass === 'function') {
@@ -38,9 +27,9 @@ var inheritEx = function (childClass, baseClass) {
                 return tmp;
             }
         }
-        var lastBaseIndex = (self._baseStack_.size() - 1);
+        var lastBaseIndex = (self._baseStack_.length - 1);
         if (lastBaseIndex >= 0) {
-            currentBase = self._baseStack_.get(lastBaseIndex);
+            currentBase = self._baseStack_[lastBaseIndex];
         } else {
             currentBase = self.base;
         }
@@ -70,14 +59,18 @@ var inheritEx = function (childClass, baseClass) {
     if (baseClass.prototype.hasOwnProperty('base')) {
         base.base = baseClass.prototype.base;
     }
-    childClass.prototype.base = base;
     childClass.base = baseClass;
     var bindTop = function (childClass) {
         var p = null;
         var bind = function (fn) {
             return function () {
                 if (!hasOwnProperty(this, '_baseStack_')) {
-                    this._baseStack_ = Stack();
+                    Object.defineProperty(this, "_baseStack_", {
+                        value: [],
+                        writable: false,
+                        enumerable: false,
+                        configurable: false
+                    });
                 }
                 this._baseStack_.push(childClass.prototype.base);
                 var result = fn.apply(this, args2Array(arguments));
@@ -96,24 +89,30 @@ var inheritEx = function (childClass, baseClass) {
     bindTop(childClass);
     childClass.prototype = extend({}, baseClass.prototype, childClass.prototype);
     childClass.prototype.__proto__ = baseClass.prototype;
-    childClass.prototype.hasOwnProperty = function (propertyName) {
-        switch (propertyName) {
-            case  '_baseStack_':
-            case  'propertyIsEnumerable':
-            case  'hasOwnProperty':
-                return false;
-        }
-        return hasOwnProperty(this, propertyName);
-    };
-    childClass.prototype.propertyIsEnumerable = function (propertyName) {
-        switch (propertyName) {
-            case  '_baseStack_':
-            case  'propertyIsEnumerable':
-            case  'hasOwnProperty':
-                return false;
-        }
-        return propertyIsEnumerable(this, propertyName);
-    };
+    Object.defineProperty(childClass.prototype, "base", {
+        value: base,
+        writable: false,
+        enumerable: false,
+        configurable: false
+    });
+//    childClass.prototype.hasOwnProperty = function (propertyName) {
+//        switch (propertyName) {
+//            case  '_baseStack_':
+//            case  'propertyIsEnumerable':
+//            case  'hasOwnProperty':
+//                return false;
+//        }
+//        return hasOwnProperty(this, propertyName);
+//    };
+//    childClass.prototype.propertyIsEnumerable = function (propertyName) {
+//        switch (propertyName) {
+//            case  '_baseStack_':
+//            case  'propertyIsEnumerable':
+//            case  'hasOwnProperty':
+//                return false;
+//        }
+//        return propertyIsEnumerable(this, propertyName);
+//    };
     return childClass;
 };
 
