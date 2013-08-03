@@ -20,7 +20,12 @@ exports.isFunction = function (b) {
     return typeof b === 'function';
 };
 
+exports.isError = function (b) {
+    return b instanceof Error;
+};
+
 exports.isArray = util.isArray;
 exports.isDate = util.isDate;
 exports.isError = util.isError;
 exports.isRegExp = util.isRegExp;
+exports.isNaN = isNaN;
