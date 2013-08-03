@@ -1,5 +1,5 @@
 exports.parseInt = function (value, defaultValue, radix) {
-    var value = parseInt(value, radix);
+    value = parseInt(value, radix);
     if (isNaN(value)) {
         return defaultValue;
     }
@@ -7,7 +7,7 @@ exports.parseInt = function (value, defaultValue, radix) {
 };
 
 exports.parseFloat = function (value, defaultValue, radix) {
-    var value = parseFloat(value, radix);
+    value = parseFloat(value, radix);
     if (isNaN(value)) {
         return defaultValue;
     }
